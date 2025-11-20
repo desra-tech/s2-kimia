@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTS Manajemen Bisnis Digital Industri Kimia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .option-card:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .slide-in { animation: slideIn 0.5s ease-out forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .tabular-nums { font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-800 via-teal-900 to-emerald-900 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-3xl glass-panel rounded-2xl shadow-2xl overflow-hidden relative flex flex-col min-h-[600px] max-h-[90vh]">
+        <!-- HEADER -->
+        <div class="bg-white/90 border-b border-gray-200 p-5 flex justify-between items-center sticky top-0 z-30 backdrop-blur-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-teal-600 rounded-lg flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-flask text-lg"></i></div>
+                <div><h1 class="text-lg font-bold text-gray-800">UTS</h1><p class="text-xs text-gray-500 uppercase font-semibold">Manajemen Bisnis Digital Industri Kimia</p></div>
+            </div>
+            <div id="header-stats" class="hidden flex items-center gap-3">
+                <div class="flex flex-col items-end"><span class="text-[10px] text-gray-400 uppercase font-bold">Waktu</span><div id="timer-display" class="tabular-nums text-xl font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded border border-teal-100">00:00</div></div>
+                <div class="flex flex-col items-center"><span class="text-[10px] text-gray-400 uppercase font-bold">Soal</span><div class="text-sm font-bold text-gray-600"><span id="current-q">1</span>/<span id="total-q">20</span></div></div>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="p-6 md:p-8 flex-grow flex flex-col relative overflow-y-auto">
+            <!-- INTRO -->
+            <div id="screen-intro" class="flex flex-col items-center justify-center h-full space-y-8 py-4 text-center slide-in">
+                <h2 class="text-3xl font-bold text-gray-800">Selamat Datang</h2>
+                <div id="login-form" class="w-full max-w-sm space-y-5 bg-white p-6 rounded-xl border border-gray-100 shadow-lg">
+                    <input type="text" id="username" class="w-full px-4 py-3 rounded-lg border border-gray-200" placeholder="Nama Lengkap">
+                    <input type="number" id="usernim" class="w-full px-4 py-3 rounded-lg border border-gray-200" placeholder="NIM">
+                    <button onclick="initQuiz()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg shadow-lg">Mulai Ujian</button>
+                </div>
+                 <div id="msg-expired" class="hidden w-full max-w-md bg-red-100 text-red-700 p-4 font-bold rounded">MAAF, WAKTU HABIS.</div>
+            </div>
+
+            <!-- QUIZ -->
+            <div id="screen-quiz" class="hidden flex-col h-full justify-between">
+                <div>
+                    <div class="mb-6"><span class="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-xs font-bold">SOAL NO. <span id="q-num-display">1</span></span><h3 id="question-text" class="text-lg md:text-xl font-medium text-gray-800 mt-4"></h3></div>
+                    <div id="options-container" class="grid gap-3"></div>
+                </div>
+                <div class="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center">
+                    <button id="btn-next" onclick="nextQuestion()" class="bg-slate-800 text-white px-8 py-3 rounded-lg font-bold disabled:opacity-50" disabled>Lanjut</button>
+                </div>
+                <div id="hint-box" class="hidden mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-sm italic"><strong class="not-italic">Petunjuk:</strong> <span id="hint-text">...</span></div>
+            </div>
+
+            <!-- LOADING -->
+            <div id="screen-loading" class="hidden flex-col items-center justify-center h-full text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-teal-500 mb-4"></div>
+                <h3 class="text-xl font-bold text-gray-800" id="loading-title">Memuat...</h3>
+            </div>
+
+            <!-- RESULT -->
+            <div id="screen-result" class="hidden flex-col items-center justify-center h-full text-center slide-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Ujian Selesai...Selamat Ya!</h2>
+                <div class="w-full max-w-sm bg-gray-50 rounded-xl border border-gray-200 p-5 mb-6 text-left space-y-3">
+                    <div class="flex justify-between"><span>Nama</span><span id="res-name" class="font-bold">...</span></div>
+                     <div class="flex justify-between"><span>Nim</span><span id="res-nim" class="font-bold">...</span></div>
+                    <div class="flex justify-between"><span>Nilai</span><span id="res-score" class="font-bold text-3xl text-teal-600">0</span></div>
+                </div>
+                <div id="db-status" class="mb-8 px-4 py-2 rounded-full bg-gray-100 text-gray-500 text-xs">Menyimpan...</div>
+                <button onclick="location.reload()" class="text-teal-600 font-semibold">Kembali</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BAGIAN JAVASCRIPT (QUIZ LOGIC DIPINDAHKAN KE SINI) -->
+    <script>
+        // --- KONFIGURASI URL GOOGLE SCRIPT ---
+        // PENTING: Paste URL Web App (Exec) Anda di sini!
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRtwG8Z_A79Y-jJjqpKqwoFgryYAx_02yhRg14ZB1wdWTGE2Dgzp9SK4ClFaptnyc8ow/exec"; 
+        const DEADLINE = new Date("2025-11-20T23:59:59");
+
+        // DATA SOAL DEFAULT (PASTE DATA LENGKAP DARI FILE QUIZ_LOGIC.JS SEBELUMNYA DI SINI)
+        // Saya persingkat untuk contoh, pastikan Anda menyalin semua soal dari file sebelumnya.
+        const DEFAULT_DATA = [
+            { question: "Contoh Soal 1?", options: [{text:"A", isCorrect:true}, {text:"B", isCorrect:false}], hint: "Pilih A" },
+             // ... Paste sisa soal dari quiz_logic.js di sini ...
+        ]; 
+        
+        // --- LOGIKA UTAMA (Sama persis dengan quiz_logic.js) ---
+        let quizQuestions = [], currentIdx = 0, score = 0, startTime, timerInterval, durationSeconds = 0;
+        const screens = { intro: document.getElementById('screen-intro'), loading: document.getElementById('screen-loading'), quiz: document.getElementById('screen-quiz'), result: document.getElementById('screen-result') };
+
+        window.onload = () => { if(new Date() > DEADLINE) { document.getElementById('login-form').style.display='none'; document.getElementById('msg-expired').classList.remove('hidden'); } };
+        function switchScreen(n) { Object.values(screens).forEach(e=>e.classList.add('hidden')); screens[n].classList.remove('hidden'); screens[n].classList.add('flex'); document.getElementById('header-stats').className = (n==='quiz')?'flex items-center gap-3':'hidden'; }
+        function shuffleArray(a) { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} }
+        
+        async function initQuiz() {
+            const name = document.getElementById('username').value.trim(), nim = document.getElementById('usernim').value.trim();
+            if(!name || !nim) return alert("Lengkapi data!");
+            if(new Date() > DEADLINE) return alert("Waktu Habis");
+            
+            switchScreen('loading');
+            
+            // Fetch Data Logic
+            try {
+                if(SCRIPT_URL) {
+                    const c = new AbortController(); setTimeout(()=>c.abort(), 4000);
+                    const res = await fetch(SCRIPT_URL, { signal: c.signal });
+                    const data = await res.json();
+                    quizQuestions = (Array.isArray(data) && data.length > 0) ? data : DEFAULT_DATA;
+                } else { throw new Error("No URL"); }
+            } catch(e) { quizQuestions = JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+
+            if(quizQuestions.length === 0) quizQuestions = DEFAULT_DATA; // Safety
+
+            shuffleArray(quizQuestions);
+            quizQuestions.forEach(q => shuffleArray(q.options));
+            
+            currentIdx = 0; score = 0; document.getElementById('total-q').innerText = quizQuestions.length;
+            switchScreen('quiz');
+            startTime = new Date();
+            timerInterval = setInterval(()=>{
+                durationSeconds = Math.floor((new Date()-startTime)/1000);
+                const m=Math.floor(durationSeconds/60).toString().padStart(2,'0'), s=(durationSeconds%60).toString().padStart(2,'0');
+                document.getElementById('timer-display').innerText = `${m}:${s}`;
+            }, 1000);
+            renderQuestion();
+        }
+
+        let selectedIdx = null;
+        function renderQuestion() {
+            const q = quizQuestions[currentIdx];
+            document.getElementById('q-num-display').innerText = currentIdx+1;
+            document.getElementById('current-q').innerText = currentIdx+1;
+            document.getElementById('question-text').innerText = q.question;
+            document.getElementById('hint-box').classList.add('hidden');
+            const nBtn = document.getElementById('btn-next'); nBtn.disabled=true; nBtn.classList.add('opacity-50'); nBtn.innerText = (currentIdx===quizQuestions.length-1)?"Selesai":"Lanjut";
+            
+            const c = document.getElementById('options-container'); c.innerHTML='';
+            q.options.forEach((o,i)=>{
+                const b = document.createElement('button');
+                b.className = "option-card w-full text-left p-4 rounded-xl border-2 border-gray-200 bg-white font-medium flex gap-3 items-start group hover:border-teal-300";
+                b.innerHTML = `<span class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 font-bold group-hover:bg-teal-100 text-teal-700">${String.fromCharCode(65+i)}</span><span>${o.text}</span>`;
+                b.onclick = () => {
+                    selectedIdx = i;
+                    Array.from(c.children).forEach(ch=>{ch.classList.remove('border-teal-500','bg-teal-50');ch.firstChild.classList.remove('bg-teal-600','text-white');});
+                    b.classList.add('border-teal-500','bg-teal-50'); b.firstChild.classList.add('bg-teal-600','text-white');
+                    nBtn.disabled=false; nBtn.classList.remove('opacity-50');
+                };
+                c.appendChild(b);
+            });
+        }
+
+        function toggleHint() { document.getElementById('hint-text').innerText = quizQuestions[currentIdx].hint||"Tidak ada petunjuk"; document.getElementById('hint-box').classList.toggle('hidden'); }
+        
+        function nextQuestion() {
+            if(quizQuestions[currentIdx].options[selectedIdx].isCorrect) score++;
+            if(currentIdx < quizQuestions.length-1) { currentIdx++; renderQuestion(); } else { finishQuiz(); }
+        }
+
+        async function finishQuiz() {
+            clearInterval(timerInterval);
+            switchScreen('loading'); document.getElementById('loading-title').innerText = "Menyimpan...";
+            
+            const final = Math.round((score/quizQuestions.length)*100);
+            document.getElementById('res-name').innerText = document.getElementById('username').value;
+            document.getElementById('res-nim').innerText = document.getElementById('usernim').value;
+            document.getElementById('res-score').innerText = final;
+            
+            let status = "Tersimpan Lokal";
+            if(SCRIPT_URL) {
+                try {
+                    await fetch(SCRIPT_URL, {
+                        method: 'POST', mode: 'no-cors',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({
+                            name: document.getElementById('username').value,
+                            nim: document.getElementById('usernim').value,
+                            score: final, correctCount: score, totalQuestions: quizQuestions.length, duration: durationSeconds
+                        })
+                    }); status = "Hasil Ujian Berhasil Disimpan ke Database!";
+                } catch(e) { status = "Gagal koneksi (Offline)"; }
+            }
+            document.getElementById('db-status').innerText = status;
+            switchScreen('result');
+        }
+    </script>
+</body>
+</html>
