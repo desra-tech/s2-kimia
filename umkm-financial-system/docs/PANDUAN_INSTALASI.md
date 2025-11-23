@@ -82,15 +82,31 @@ Ulangi proses di atas untuk file-file berikut:
 Upload file-file HTML:
 
 1. Klik **+** → **HTML**
-2. Beri nama sesuai file
-3. Upload file-file berikut satu per satu:
+2. Beri nama sesuai file (tanpa ekstensi .html)
+3. **⚠️ PENTING:** Upload SEMUA file HTML berikut satu per satu dari folder `/frontend/`:
    - `Login.html`
    - `Index.html`
    - `Styles.html`
    - `Scripts.html`
    - `Dashboard.html`
    - `Penerimaan.html`
-   - Dan file HTML lainnya dari folder `/frontend/`
+   - `Pengeluaran.html`
+   - `Modal.html` ⚠️ **File ini sering terlupa!**
+   - `Accounts.html`
+   - `Customers.html`
+   - `Suppliers.html`
+   - `Products.html`
+   - `POS.html`
+   - `Inventory.html`
+   - `Receivables.html`
+   - `Payables.html`
+   - `ProfitLoss.html`
+   - `BalanceSheet.html`
+   - `CashFlow.html`
+   - `Users.html`
+   - `Settings.html`
+
+**Total: 21 file HTML harus diupload!**
 
 ### Langkah 5: Deploy sebagai Web App
 
@@ -176,6 +192,27 @@ Setelah deployment berhasil:
 
 ## Testing
 
+### Test 0: Verifikasi File (RECOMMENDED)
+
+**⚠️ Jalankan test ini terlebih dahulu untuk memastikan semua file telah diupload!**
+
+1. Buka Apps Script Editor
+2. Pilih fungsi `verifyHtmlFiles` dari dropdown
+3. Klik **Run** (▶️)
+4. Tunggu hingga eksekusi selesai
+5. Klik **View** → **Logs** untuk melihat hasil
+6. Hasil yang diharapkan:
+   ```
+   ✓ All HTML files are present!
+   Found: 21 files
+   Missing: 0 files
+   ```
+7. Jika ada file yang missing:
+   - Lihat daftar file yang hilang di log
+   - Upload file yang hilang (Langkah 4)
+   - Jalankan `verifyHtmlFiles` lagi
+   - Deploy ulang web app
+
 ### Test 1: Membuat Transaksi Penerimaan
 
 1. Klik menu **Transaksi** → **Penerimaan**
@@ -205,6 +242,33 @@ Setelah deployment berhasil:
 5. Verifikasi pelanggan muncul di daftar
 
 ## Troubleshooting
+
+### Masalah: "Exception: No HTML file named [FileName] was found"
+
+**Penyebab:** File HTML tidak diupload ke Google Apps Script
+
+**Solusi:**
+1. Buka Apps Script Editor
+2. Cek daftar file di panel kiri
+3. Pastikan SEMUA 21 file HTML sudah ada:
+   - Login, Index, Styles, Scripts, Dashboard
+   - Penerimaan, Pengeluaran, **Modal** ⚠️
+   - Accounts, Customers, Suppliers, Products
+   - POS, Inventory, Receivables, Payables
+   - ProfitLoss, BalanceSheet, CashFlow
+   - Users, Settings
+4. Upload file yang hilang:
+   - Klik **+** → **HTML**
+   - Beri nama sesuai file yang hilang (tanpa .html)
+   - Salin isi dari folder `/frontend/[NamaFile].html`
+   - Paste ke editor
+   - Save (Ctrl+S)
+5. Deploy ulang web app:
+   - Deploy → Manage deployments
+   - Edit deployment
+   - Pilih "New version"
+   - Deploy
+6. Refresh halaman web app
 
 ### Masalah: "Authorization required"
 
