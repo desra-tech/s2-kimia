@@ -323,6 +323,62 @@ function getDefaultSettings() {
 }
 
 /**
+ * Verify all required HTML files are uploaded
+ */
+function verifyHtmlFiles() {
+  const requiredFiles = [
+    'Login', 'Index', 'Styles', 'Scripts', 'Dashboard',
+    'Penerimaan', 'Pengeluaran', 'Modal',
+    'Accounts', 'Customers', 'Suppliers', 'Products',
+    'POS', 'Inventory', 'Receivables', 'Payables',
+    'ProfitLoss', 'BalanceSheet', 'CashFlow',
+    'Users', 'Settings'
+  ];
+
+  Logger.log('Verifying HTML files...');
+  Logger.log('Required files: ' + requiredFiles.length);
+
+  const missingFiles = [];
+  const foundFiles = [];
+
+  requiredFiles.forEach(function(filename) {
+    try {
+      HtmlService.createHtmlOutputFromFile(filename);
+      foundFiles.push(filename);
+      Logger.log('✓ ' + filename + '.html found');
+    } catch (error) {
+      missingFiles.push(filename);
+      Logger.log('✗ ' + filename + '.html MISSING');
+    }
+  });
+
+  Logger.log('\n=== VERIFICATION RESULT ===');
+  Logger.log('Found: ' + foundFiles.length + ' files');
+  Logger.log('Missing: ' + missingFiles.length + ' files');
+
+  if (missingFiles.length > 0) {
+    Logger.log('\n⚠️ MISSING FILES:');
+    missingFiles.forEach(function(file) {
+      Logger.log('  - ' + file + '.html');
+    });
+    Logger.log('\nUpload missing files to fix "No HTML file named [Name] was found" errors');
+    return {
+      success: false,
+      message: 'Missing ' + missingFiles.length + ' files',
+      missingFiles: missingFiles,
+      foundFiles: foundFiles
+    };
+  } else {
+    Logger.log('\n✓ All HTML files are present!');
+    return {
+      success: true,
+      message: 'All HTML files verified',
+      foundFiles: foundFiles
+    };
+  }
+}
+
+/**
  * Test function to verify setup
  */
 function testSetup() {
@@ -337,6 +393,13 @@ function testSetup() {
     const testSheet = getSheet(SHEETS.USERS);
     Logger.log('✓ Sheet creation works');
 
+    // Verify HTML files
+    const htmlVerification = verifyHtmlFiles();
+    if (!htmlVerification.success) {
+      Logger.log('⚠️ Warning: Some HTML files are missing');
+      Logger.log('Missing files: ' + htmlVerification.missingFiles.join(', '));
+    }
+
     // Test database initialization
     const initResult = initializeDatabase();
     Logger.log('✓ Database initialization: ' + JSON.stringify(initResult));
@@ -345,8 +408,8 @@ function testSetup() {
     const testHash = hashPassword('test123', 'salt123');
     Logger.log('✓ Password hashing works');
 
-    Logger.log('All tests passed!');
-    return true;
+    Logger.log('\nSetup test completed!');
+    return htmlVerification.success;
   } catch (error) {
     Logger.log('✗ Test failed: ' + error.toString());
     return false;
