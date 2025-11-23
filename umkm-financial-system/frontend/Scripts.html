@@ -52,7 +52,12 @@
     }
 
     // Navigation
-    function showSection(sectionName) {
+    function showSection(sectionName, event) {
+        // Prevent default link behavior
+        if (event) {
+            event.preventDefault();
+        }
+
         // Hide all sections
         const sections = document.querySelectorAll('.content-section');
         sections.forEach(section => {
@@ -72,7 +77,20 @@
         }
 
         // Update active menu item
-        event.target.closest('.menu-item').classList.add('active');
+        if (event && event.target) {
+            const menuItem = event.target.closest('.menu-item');
+            if (menuItem) {
+                menuItem.classList.add('active');
+            }
+        } else {
+            // If no event, find and activate the menu item by section name
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(sectionName)) {
+                    item.classList.add('active');
+                }
+            });
+        }
 
         // Update page title
         const titles = {

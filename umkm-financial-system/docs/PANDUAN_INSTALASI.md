@@ -294,6 +294,40 @@ Hapus atau comment line yang berisi `setXFrameOptionsMode`:
 // output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY);
 ```
 
+### Masalah: Menu tidak berfungsi / URL hanya menampilkan "#"
+
+**Gejala:**
+- Klik menu tidak pindah halaman
+- URL tetap dengan "#" di akhir
+- Halaman tidak berubah saat klik menu
+
+**Penyebab:** JavaScript error di fungsi showSection() - variabel event tidak terdefinisi
+
+**Solusi:**
+1. Update file **Scripts.html**:
+   - Buka Apps Script Editor
+   - Buka file `Scripts.html`
+   - Cari fungsi `showSection(sectionName)` (sekitar baris 55)
+   - Ubah menjadi `showSection(sectionName, event)`
+   - Update kode untuk handle event parameter dengan benar
+   - Ganti dengan versi terbaru dari repository
+
+2. Update file **Index.html**:
+   - Buka file `Index.html`
+   - Cari semua onclick handler (contoh: `onclick="showSection('dashboard')"`)
+   - Ubah menjadi: `onclick="showSection('dashboard', event); return false;"`
+   - Lakukan untuk SEMUA menu item (14 menu items total)
+   - Ganti dengan versi terbaru dari repository
+
+3. **Deploy ulang:**
+   - Save kedua file (Ctrl+S)
+   - Deploy → Manage deployments
+   - Edit deployment
+   - New version
+   - Deploy
+   - **Clear browser cache** (Ctrl+Shift+Delete)
+   - Refresh web app
+
 ### Masalah: "Authorization required"
 
 **Solusi:**
