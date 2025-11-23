@@ -54,21 +54,32 @@ function doGet(e) {
     // Check if user has valid session
     const session = getSession();
 
+    let output;
+
     if (session && session.userId) {
       // User logged in, show main app
-      return HtmlService.createTemplateFromFile('Index')
+      output = HtmlService.createTemplateFromFile('Index')
         .evaluate()
-        .setTitle(CONFIG.APP_NAME)
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
-        .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+        .setTitle(CONFIG.APP_NAME);
     } else {
       // User not logged in, show login page
-      return HtmlService.createTemplateFromFile('Login')
+      output = HtmlService.createTemplateFromFile('Login')
         .evaluate()
-        .setTitle(CONFIG.APP_NAME + ' - Login')
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
-        .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+        .setTitle(CONFIG.APP_NAME + ' - Login');
     }
+
+    // Add security headers and meta tags
+    try {
+      output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY);
+    } catch (e) {
+      // XFrameOptionsMode might not be available in some environments
+      Logger.log('Warning: Could not set XFrameOptionsMode - ' + e.toString());
+    }
+
+    output.addMetaTag('viewport', 'width=device-width, initial-scale=1');
+
+    return output;
+
   } catch (error) {
     Logger.log('Error in doGet: ' + error.toString());
     return HtmlService.createHtmlOutput('<h1>Error loading application</h1><p>' + error.toString() + '</p>');

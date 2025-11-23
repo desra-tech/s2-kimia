@@ -270,6 +270,30 @@ Setelah deployment berhasil:
    - Deploy
 6. Refresh halaman web app
 
+### Masalah: "Exception: Argument cannot be null: mode"
+
+**Penyebab:** Issue dengan setXFrameOptionsMode di Google Apps Script
+
+**Solusi:**
+File Code.gs sudah diperbaiki dengan error handling. Jika masih error:
+
+1. Buka Apps Script Editor
+2. Buka file `Code.gs`
+3. Cari fungsi `doGet(e)` (sekitar baris 52)
+4. Pastikan kode sudah menggunakan versi terbaru dengan try-catch untuk setXFrameOptionsMode
+5. Jika perlu, ganti seluruh file Code.gs dengan versi terbaru dari repository
+6. Save dan deploy ulang:
+   - Deploy → Manage deployments
+   - Edit deployment
+   - New version
+   - Deploy
+
+**Versi alternatif (jika masih error):**
+Hapus atau comment line yang berisi `setXFrameOptionsMode`:
+```javascript
+// output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY);
+```
+
 ### Masalah: "Authorization required"
 
 **Solusi:**
